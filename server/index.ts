@@ -8,6 +8,12 @@ const todoInputType = z.object({
     description: z.string()
 });
 
+const userInputTypes = z.object({
+    userName: z.string(),
+    email: z.string(),
+    password : z.string()
+})
+
 const appRouter = router({
     createTodo: publicProcedure
         .input(todoInputType)
@@ -24,11 +30,33 @@ const appRouter = router({
             }
             
 
-    })
+        }),
+    signup: publicProcedure
+        .input(userInputTypes)
+        .mutation(async (opts) => {
+            const token = opts.ctx.userName;
+
+            // data will inserted into the db
+            //we will create jwt token here
+            // const token = password // for now just go with that 
+
+            return {
+                token,
+            }
+        }),
+    
 });
  
 const server = createHTTPServer({
-  router: appRouter,
+    router: appRouter,
+    createContext(opts) {
+
+        let authHeader = opts.req.headers['authorization'];
+        console.log(authHeader)
+        return {
+            userName: "test"
+        };  
+    }
 });
  
 server.listen(3000);
